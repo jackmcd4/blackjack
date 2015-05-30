@@ -10,6 +10,7 @@ class window.AppView extends Backbone.View
     'click .stand-button': -> @model.get('playerHand').stand()
 
   initialize: ->
+    @listenTo(@model,'change:gameStatus', @renderGameStatus)
     @render()
 
   render: ->
@@ -18,3 +19,8 @@ class window.AppView extends Backbone.View
     @$('.player-hand-container').html new HandView(collection: @model.get 'playerHand').el
     @$('.dealer-hand-container').html new HandView(collection: @model.get 'dealerHand').el
 
+  renderGameStatus: ->
+    callback = @model.get('gameStatus')
+    @$el.html "<h1>#{callback}</h1>"
+    # @$el.detach()
+    debugger

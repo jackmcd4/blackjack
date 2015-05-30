@@ -6,17 +6,17 @@ class window.App extends Backbone.Model
     @set 'playerHand', deck.dealPlayer()
     @set 'dealerHand', deck.dealDealer()
     @set 'game', game = new Game()
-
     @listenTo @get('playerHand'), 'hit', @checkPlayerHand
     # @listenTo @get('playerHand'), 'hit', @checkHand
     @listenTo @get('playerHand'), 'stand', @playDealerHand
-
+    @listenTo @get('dealerHand'), 'hit', @dealerCheck
+    @set 'gameStatus', ''
 
   checkPlayerHand: ->
     scoresArr = @get('playerHand').scores()
     console.log scoresArr
     if scoresArr[0] > 21
-      debugger
+      @dealerWin();
 
   playDealerHand: ->
     @flipDealerCard()
@@ -29,11 +29,6 @@ class window.App extends Backbone.Model
     dealerHand = @get('dealerHand')
     dealerHand.models[0].flip()
 
-  dealerCheck: ->
-    while (@get('dealerHand').scores())[1] < 17
-      debugger
-      @dealerHit()
-
   dealerHit: ->
     @get('dealerHand').hit()
 
@@ -45,26 +40,29 @@ class window.App extends Backbone.Model
       value = @get('playerHand').scores()[1]
 
   dealerLose: ->
+    @set('gameStatus', 'Let me get my money back...')
 
   dealerWin: ->
+    @set('gameStatus', 'Bitch, you lost')
 
   tie: ->
+    @set('gameStatus', 'Dealer mad, it\'s a tie')
 
   dealerCheck: ->
     dealerScore = @get('dealerHand').scores()
     playerScore = @get('playerHand').scores()
     pScore = playerScore[1]
     if pScore > 21 then pScore = playerScore[0]
-
-    if dealerScore[1] > 21 && dealerScore[0] > 21
-      @dealerLose()
+    if dealerScore[1] < 17 then @dealerHit()
+    if dealerScore[1] > 21 && dealerScore[0] < 17 then @dealerHit()
+    else if dealerScore[1] > 21 && dealerScore[0] > 21
+      setTimeout @dealerLose.bind(@), 1000
     else if dealerScore[1] > pScore && dealerScore[1] < 21
-      @dealerWin()
+      setTimeout @dealerWin.bind(@), 1000
     else if dealerScore[0] > pScore && dealerScore[0] < 21
-      @dealerWin()
-    else if pScore == 21 && dealerScore[1] == 21 || pScore == 21 && dealerScore[0] == 21
-      @tie()
+      setTimeout @dealerWin.bind(@), 1000
+    else if (pScore == 21 && dealerScore[1] == 21) || (pScore == 21 && dealerScore[0] == 21)
+      setTimeout @tie.bind(@), 1000
     else
-      @dealerHit()
+      setTimeout @dealerHit.bind(@), 1000
 
-###
