@@ -1,2 +1,4 @@
 class window.Game extends Backbone.Model
-  initialize: (params) ->
+  initialize: ->
+
+# card.score changed, therefore we need to check the rules and return whatever happens next
